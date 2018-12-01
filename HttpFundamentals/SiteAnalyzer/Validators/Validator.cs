@@ -6,13 +6,17 @@ using SiteAnalizer.Infrastructure.Interfaces;
 namespace SiteAnalyzer.Validators
 {
     /// <summary>
-    /// Represents a <see cref="UrlValidator"/> class.
+    /// Represents a <see cref="Validator"/> class.
     /// </summary>
-    public class UrlValidator : IValidator
+    public class Validator : IValidator
     {
         private readonly IEnumerable<IConstraintRule> _constraintRules;
 
-        public UrlValidator(IEnumerable<IConstraintRule> constraintRules)
+        /// <summary>
+        /// Initialize a <see cref="Validator"/> class.
+        /// </summary>
+        /// <param name="constraintRules"></param>
+        public Validator(IEnumerable<IConstraintRule> constraintRules)
         {
             _constraintRules = constraintRules;
         }

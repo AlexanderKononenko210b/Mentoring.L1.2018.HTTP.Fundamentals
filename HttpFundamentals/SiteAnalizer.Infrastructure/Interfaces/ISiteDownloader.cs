@@ -13,7 +13,8 @@ namespace SiteAnalizer.Infrastructure.Interfaces
         /// Download site from uri.
         /// </summary>
         /// <param name="uri">The uri.</param>
+        /// <param name="currentLevel">The current level.</param>
         /// <returns>Site content stream.</returns>
-        Task<Stream> DownloadAsync(Uri uri);
+        Task<Stream> DownloadAsync(Uri uri, int currentLevel);
     }
 }

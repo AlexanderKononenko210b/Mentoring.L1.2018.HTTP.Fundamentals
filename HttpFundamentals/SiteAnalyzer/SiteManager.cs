@@ -16,27 +16,39 @@ namespace SiteAnalyzer
     {
         private readonly ISiteDownloader _siteDownloader;
         private readonly IValidator _validator;
-        private readonly ISiteSaver _siteSaver;
         private readonly ILogger _logger;
         private readonly int _maxDeepLevel;
-        private HashSet<Uri>[] _linksArray;
-        
+
         public SiteManager(
             ISiteDownloader siteDownloader,
             IValidator validator,
-            ISiteSaver siteSaver,
             ILogger logger,
             int maxDeepLevel)
         {
             _siteDownloader = siteDownloader;
-            _siteSaver = siteSaver;
             _logger = logger;
             _validator = validator;
             _maxDeepLevel = maxDeepLevel;
-            _linksArray = new HashSet<Uri>[_maxDeepLevel + 1];
         }
 
-        public HashSet<Uri>[] LinksArray => _linksArray;
+        /// <summary>
+        /// Start download information.
+        /// </summary>
+        /// <param name="uries">The uries for download.</param>
+        /// <param name="countLevel">The count level.</param>
+        public void Start(IEnumerable<Uri> uries, int countLevel)
+        {
+            _logger.Log($"Level {countLevel}");
+            var links = Analyze(uries, countLevel).ToArray();
+
+            if (!links.Any()) return;
+
+            ++countLevel;
+
+            if (countLevel > _maxDeepLevel) return;
+
+            Start(links, countLevel);
+        }
 
         /// <summary>
         /// Start analyzing Uri.
@@ -44,37 +56,26 @@ namespace SiteAnalyzer
         /// <param name="uries">The uries.</param>
         /// <param name="currentLevel">The current level.</param>
         /// <returns>The <see cref="IEnumerable{Uri}"/> instance.</returns>
-        public IEnumerable<Uri> StartAnalyze(IEnumerable<Uri> uries, int currentLevel)
+        private IEnumerable<Uri> Analyze(IEnumerable<Uri> uries, int currentLevel)
         {
             var workLinks = new HashSet<Uri>();
 
             try
             {
-                var content = Task.WhenAll(uries.Select(url => _siteDownloader.DownloadAsync(url)
-                    .ContinueWith(task =>
+                var content = Task.WhenAll(uries
+                        .Select(url => _siteDownloader.DownloadAsync(url, currentLevel)
+                            .ContinueWith(task => GetLinks(task.Result))
+                    )).ContinueWith(task =>
                     {
-                        _siteSaver.Save(task.Result);
-                        return GetLinks(task.Result);
-                    }
-                ))).ContinueWith(task =>
-                {
-                    foreach (var link in task.Result)
-                    {
-                        workLinks.UnionWith(link);
-                    }
-
-                    return workLinks;
-                });
-
-                if (_linksArray[currentLevel] == null)
-                {
-                    _linksArray[currentLevel] = new HashSet<Uri>();
-                }
+                        foreach (var link in task.Result)
+                        {
+                            workLinks.UnionWith(link);
+                        }
+                        
+                        return workLinks;
+                    });
 
                 workLinks = content.GetAwaiter().GetResult();
-                _linksArray[currentLevel].UnionWith(workLinks);
-
-                return workLinks;
             }
             catch (Exception ex)
             {
@@ -91,8 +92,13 @@ namespace SiteAnalyzer
         /// <returns>IEnumerable Uri links</returns>
         private IEnumerable<Uri> GetLinks(Stream content)
         {
-            HtmlDocument document = new HtmlDocument();
+            if (content == null)
+            {
+                return new Uri[0];
+            }
 
+            HtmlDocument document = new HtmlDocument();
+            
             try
             {
                 document.Load(content, Encoding.UTF8);
@@ -102,13 +108,11 @@ namespace SiteAnalyzer
                 Console.WriteLine(e.Message);
             }
 
-            var test = document.DocumentNode
+            return document.DocumentNode
                 .Descendants()
                 .SelectMany(d => d.Attributes.Where(IsValidLink))
                 .Where(uri => _validator.IsValid(uri.Value))
                 .Select(link => new Uri(link.Value));
-
-            return test;
         }
 
         /// <summary>

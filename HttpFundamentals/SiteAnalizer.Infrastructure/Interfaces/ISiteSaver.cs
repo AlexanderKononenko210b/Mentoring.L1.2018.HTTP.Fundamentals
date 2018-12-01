@@ -8,9 +8,11 @@ namespace SiteAnalizer.Infrastructure.Interfaces
     public interface ISiteSaver
     {
         /// <summary>
-        /// Save sites content.
+        /// Save sites content as file.
         /// </summary>
         /// <param name="contentStream">The content stream.</param>
-        void Save(Stream contentStream);
+        /// <param name="nameFileWithExtension">The name file with extension.</param>
+        /// <param name="currentLevel">The current level.</param>
+        void Save(Stream contentStream, string nameFileWithExtension, int currentLevel);
     }
 }

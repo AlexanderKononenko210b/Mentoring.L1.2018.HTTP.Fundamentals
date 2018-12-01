@@ -1,7 +1,7 @@
 ﻿using CommandLine;
 using SiteAnalizer.Infrastructure.Enums;
 
-namespace ConsoleUI.ConsoleParameters
+namespace ConsoleUI.Parameters
 {
     /// <summary>
     /// Represents a <see cref="ConsoleParameters"/> class.
@@ -29,7 +29,7 @@ namespace ConsoleUI.ConsoleParameters
         /// <summary>
         /// Content extensions.
         /// </summary>
-        [Option ('e', "ContentExtensions", DefaultValue = "gif, jpeg, jpg, pdf", HelpText = "ContentExtensions - type string array (example: gif, jpeg, jpg, pdf)")]
+        [Option ('e', "ContentExtensions", DefaultValue = "gif,jpeg,jpg,pdf", HelpText = "ContentExtensions - type string array (example: gif,jpeg,jpg,pdf)")]
         public string ContentExtensions { get; set; }
     }
 }

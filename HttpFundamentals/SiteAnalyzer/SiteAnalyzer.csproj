@@ -49,8 +49,10 @@
     <Compile Include="SiteManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SiteSaver.cs" />
+    <Compile Include="Validators\DomainConstraint.cs" />
+    <Compile Include="Validators\ExtensionConstraint.cs" />
     <Compile Include="Validators\SchemeConstraint.cs" />
-    <Compile Include="Validators\UrlValidator.cs" />
+    <Compile Include="Validators\Validator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SiteAnalizer.Infrastructure\SiteAnalizer.Infrastructure.csproj">

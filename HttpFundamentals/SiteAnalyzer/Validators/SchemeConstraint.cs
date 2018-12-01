@@ -1,5 +1,5 @@
-﻿using SiteAnalizer.Infrastructure.Interfaces;
-using System;
+﻿using System;
+using SiteAnalizer.Infrastructure.Interfaces;
 
 namespace SiteAnalyzer.Validators
 {
@@ -9,10 +9,7 @@ namespace SiteAnalyzer.Validators
     public class SchemeConstraint : IConstraintRule
     {
         /// <inheritdoc/>
-        public bool IsValid(Uri uri)
-        {
-            return uri.Scheme.Equals("http") || uri.Scheme.Equals("https");
-        }
+        public bool IsValid(Uri uri) => uri.Scheme.Equals("http") || uri.Scheme.Equals("https");
 
         /// <inheritdoc/>
         public bool IsValid(string url) => url.StartsWith("http") | url.StartsWith("https") &&
@@ -25,10 +22,7 @@ namespace SiteAnalyzer.Validators
         /// <param name="inputString">string</param>
         /// <param name="substring">substring for count</param>
         /// <returns>count substring in string</returns>
-        private static int CountSubstringInUrl(string inputString, string substring)
-        {
-            int count = (inputString.Length - inputString.Replace(substring, "").Length) / substring.Length;
-            return count;
-        }
+        private static int CountSubstringInUrl(string inputString, string substring) => 
+            (inputString.Length - inputString.Replace(substring, "").Length) / substring.Length;
     }
 }
