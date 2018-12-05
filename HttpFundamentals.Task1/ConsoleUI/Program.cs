@@ -32,13 +32,13 @@ namespace ConsoleUI
                 new SchemeConstraint(),
                 new DomainConstraint(new Uri(parameters.BaseUrl), parameters.DomainRestriction)
             });
-            var siteManager = new SiteManager(siteDownloader, urlValidator, logger, parameters.MaxDeepLevel);
+            var siteManager = new SiteManager(siteDownloader, urlValidator, logger);
             var listUrl = new List<Uri> { new Uri(parameters.BaseUrl) };
             var countLevel = 0;
             
             try
             {
-                siteManager.Start(listUrl, countLevel);
+                siteManager.Start(listUrl, parameters.MaxDeepLevel, countLevel);
             }
             catch (Exception e)
             {

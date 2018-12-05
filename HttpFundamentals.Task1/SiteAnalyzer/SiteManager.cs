@@ -17,18 +17,15 @@ namespace SiteAnalyzer
         private readonly ISiteDownloader _siteDownloader;
         private readonly IValidator _validator;
         private readonly ILogger _logger;
-        private readonly int _maxDeepLevel;
 
         public SiteManager(
             ISiteDownloader siteDownloader,
             IValidator validator,
-            ILogger logger,
-            int maxDeepLevel)
+            ILogger logger)
         {
             _siteDownloader = siteDownloader;
             _logger = logger;
             _validator = validator;
-            _maxDeepLevel = maxDeepLevel;
         }
 
         /// <summary>
@@ -36,7 +33,8 @@ namespace SiteAnalyzer
         /// </summary>
         /// <param name="uries">The uries for download.</param>
         /// <param name="countLevel">The count level.</param>
-        public void Start(IEnumerable<Uri> uries, int countLevel)
+        /// <param name="maxDeepLevel">The max deep level.</param>
+        public void Start(IEnumerable<Uri> uries, int maxDeepLevel, int countLevel)
         {
             _logger.Log($"Level {countLevel}");
             var links = Analyze(uries, countLevel).ToArray();
@@ -45,9 +43,9 @@ namespace SiteAnalyzer
 
             ++countLevel;
 
-            if (countLevel > _maxDeepLevel) return;
+            if (countLevel > maxDeepLevel) return;
 
-            Start(links, countLevel);
+            Start(links, countLevel, maxDeepLevel);
         }
 
         /// <summary>
