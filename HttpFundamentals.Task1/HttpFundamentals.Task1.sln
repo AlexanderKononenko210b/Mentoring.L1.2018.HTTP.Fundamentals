@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteAnalyzer", "SiteAnalyze
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUI", "ConsoleUI\ConsoleUI.csproj", "{F43BC90E-B9DD-4D85-8817-BFBAF02E42BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteAnalizer.Infrastructure", "SiteAnalizer.Infrastructure\SiteAnalizer.Infrastructure.csproj", "{1B228F73-2C88-4E8E-A6E6-7AE20099481C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteAnalyzer.Infrastructure", "SiteAnalyzer.Infrastructure\SiteAnalyzer.Infrastructure.csproj", "{1B228F73-2C88-4E8E-A6E6-7AE20099481C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

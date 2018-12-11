@@ -1,4 +1,4 @@
-﻿using SiteAnalizer.Infrastructure.Interfaces;
+﻿using SiteAnalyzer.Infrastructure.Interfaces;
 using System;
 using System.Linq;
 

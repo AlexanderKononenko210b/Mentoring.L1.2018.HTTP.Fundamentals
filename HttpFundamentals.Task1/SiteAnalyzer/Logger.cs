@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using SiteAnalizer.Infrastructure.Interfaces;
+using SiteAnalyzer.Infrastructure.Interfaces;
+
 
 namespace SiteAnalyzer
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SiteAnalizer.Infrastructure.Interfaces
+namespace SiteAnalyzer.Infrastructure.Interfaces
 {
     /// <summary>
     /// Represents an <see cref="IValidator"/> interface.

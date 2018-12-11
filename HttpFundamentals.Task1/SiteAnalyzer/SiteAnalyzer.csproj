@@ -55,13 +55,13 @@
     <Compile Include="Validators\Validator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SiteAnalizer.Infrastructure\SiteAnalizer.Infrastructure.csproj">
-      <Project>{1b228f73-2c88-4e8e-a6e6-7ae20099481c}</Project>
-      <Name>SiteAnalizer.Infrastructure</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\SiteAnalyzer.Infrastructure\SiteAnalyzer.Infrastructure.csproj">
+      <Project>{1b228f73-2c88-4e8e-a6e6-7ae20099481c}</Project>
+      <Name>SiteAnalyzer.Infrastructure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -56,9 +56,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SiteAnalizer.Infrastructure\SiteAnalizer.Infrastructure.csproj">
+    <ProjectReference Include="..\SiteAnalyzer.Infrastructure\SiteAnalyzer.Infrastructure.csproj">
       <Project>{1b228f73-2c88-4e8e-a6e6-7ae20099481c}</Project>
-      <Name>SiteAnalizer.Infrastructure</Name>
+      <Name>SiteAnalyzer.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\SiteAnalyzer\SiteAnalyzer.csproj">
       <Project>{bf3a7c53-81b0-468b-a3a4-d68d67da80b6}</Project>

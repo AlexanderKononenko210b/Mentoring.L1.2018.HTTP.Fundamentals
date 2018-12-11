@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
-using SiteAnalizer.Infrastructure.Interfaces;
+using SiteAnalyzer.Infrastructure.Interfaces;
 
 namespace SiteAnalyzer
 {

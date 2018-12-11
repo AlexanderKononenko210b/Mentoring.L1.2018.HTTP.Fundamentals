@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using SiteAnalizer.Infrastructure.Enums;
+using SiteAnalyzer.Infrastructure.Enums;
 
 namespace ConsoleUI.Parameters
 {
