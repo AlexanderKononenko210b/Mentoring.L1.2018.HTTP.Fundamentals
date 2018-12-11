@@ -1,6 +1,6 @@
 ﻿using System;
-using SiteAnalizer.Infrastructure.Enums;
-using SiteAnalizer.Infrastructure.Interfaces;
+using SiteAnalyzer.Infrastructure.Enums;
+using SiteAnalyzer.Infrastructure.Interfaces;
 
 namespace SiteAnalyzer.Validators
 {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SiteAnalizer.Infrastructure.Interfaces
+namespace SiteAnalyzer.Infrastructure.Interfaces
 {
     /// <summary>
     /// Represents an <see cref="ISiteDownloader"/> interface.

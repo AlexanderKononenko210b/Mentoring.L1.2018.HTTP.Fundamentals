@@ -1,5 +1,5 @@
 ﻿using System;
-using SiteAnalizer.Infrastructure.Interfaces;
+using SiteAnalyzer.Infrastructure.Interfaces;
 
 namespace SiteAnalyzer.Validators
 {

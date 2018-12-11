@@ -1,4 +1,4 @@
-﻿namespace SiteAnalizer.Infrastructure.Enums
+﻿namespace SiteAnalyzer.Infrastructure.Enums
 {
     /// <summary>
     /// Domain restriction.

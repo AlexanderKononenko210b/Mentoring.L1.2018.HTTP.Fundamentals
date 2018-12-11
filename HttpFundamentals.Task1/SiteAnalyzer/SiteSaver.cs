@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
-using SiteAnalizer.Infrastructure.Interfaces;
+using SiteAnalyzer.Infrastructure.Interfaces;
 
 namespace SiteAnalyzer
 {
@@ -55,7 +55,7 @@ namespace SiteAnalyzer
         /// <param name="inputFileName">The input file name.</param>
         /// <returns>The valid file name.</returns>
         private string GetValidPathName(string inputFileName) => 
-            string.Concat(inputFileName.Where(simbol => !Path.GetInvalidFileNameChars().Any(invalidChar => invalidChar == simbol)));
+            string.Concat(inputFileName.Where(simbol => Path.GetInvalidFileNameChars().All(invalidChar => invalidChar != simbol)));
 
         /// <summary>
         /// Save content to file.

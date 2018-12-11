@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SiteAnalizer.Infrastructure.Interfaces
+namespace SiteAnalyzer.Infrastructure.Interfaces
 {
     /// <summary>
     /// Represents an <see cref="ILogger"/> interface.

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using SiteAnalizer.Infrastructure.Interfaces;
+using SiteAnalyzer.Infrastructure.Interfaces;
 
 namespace SiteAnalyzer
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using ConsoleUI.Parameters;
-using SiteAnalizer.Infrastructure.Interfaces;
+using SiteAnalyzer.Infrastructure.Interfaces;
 using SiteAnalyzer;
 using SiteAnalyzer.Validators;
 
