@@ -20,7 +20,7 @@ namespace HttpListener.BusinessLayer.Parsers
                 var data = reader.ReadToEnd().Split('&');
 
                 var searchInfo = new SearchInfo();
-                searchInfo.CustomerId = GetIntParameter("customerId", data);
+                searchInfo.CustomerId = GetStringParameter("customerId", data);
                 searchInfo.From = GetDateTimeParameter("from", data);
                 searchInfo.To = GetDateTimeParameter("to", data);
                 searchInfo.Skip = GetIntParameter("skip", data);
@@ -36,7 +36,7 @@ namespace HttpListener.BusinessLayer.Parsers
             if (queryStrings == null || queryStrings.Count == 0) return null;
 
             var searchInfo = new SearchInfo();
-            searchInfo.CustomerId = int.TryParse(queryStrings["CustomerId"], out var customerId) ? (int?)customerId : null;
+            searchInfo.CustomerId = queryStrings["CustomerId"];
             searchInfo.From = DateTime.TryParse(queryStrings["from"], out var fromDateTime) ? (DateTime?)fromDateTime : null;
             searchInfo.To = DateTime.TryParse(queryStrings["to"], out var toDateTime) ? (DateTime?)toDateTime : null;
             searchInfo.Skip = int.TryParse(queryStrings["skip"], out var skipResult) ? (int?)skipResult : null;
@@ -46,11 +46,25 @@ namespace HttpListener.BusinessLayer.Parsers
         }
 
         /// <summary>
+        /// Get string parameter from body data.
+        /// </summary>
+        /// <param name="name">The name parameter.</param>
+        /// <param name="data">The body data as string[].</param>
+        /// <returns>The <see cref="{string}"/></returns>
+        private string GetStringParameter(string name, string[] data)
+        {
+            var parameterKeyValue = data.FirstOrDefault(param => param.StartsWith(name))?.Split('=');
+            if(parameterKeyValue != null && parameterKeyValue.Length == 2) return parameterKeyValue[1];
+
+            return null;
+        }
+
+        /// <summary>
         /// Get int parameter from body data.
         /// </summary>
         /// <param name="name">The name parameter.</param>
         /// <param name="data">The body data as string[].</param>
-        /// <returns></returns>
+        /// <returns>The <see cref="{int}"/></returns>
         private int? GetIntParameter(string name, string[] data)
         {
             var parameterKeyValue = data.FirstOrDefault(param => param.StartsWith(name))?.Split('=');

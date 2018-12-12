@@ -1,9 +1,4 @@
-﻿using HttpListener.BusinessLayer.Infrastructure.Interfaces;
-using HttpListener.BusinessLayer.Infrastructure.Models;
-using HttpListener.BusinessLayer.MapperConfigurations;
-using HttpListener.DataLayer.Infrastructure.Interfaces;
-using HttpListener.DataLayer.Infrastructure.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +6,11 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using HttpListener.BusinessLayer.Infrastructure.Enums;
+using HttpListener.BusinessLayer.Infrastructure.Interfaces;
+using HttpListener.BusinessLayer.Infrastructure.Models;
+using HttpListener.BusinessLayer.MapperConfigurations;
+using HttpListener.DataLayer.Infrastructure.Interfaces;
+using HttpListener.DataLayer.Infrastructure.Models;
 using Mapper = AutoMapper.Mapper;
 
 namespace HttpListener.BusinessLayer
@@ -32,6 +32,7 @@ namespace HttpListener.BusinessLayer
             _parser = parser;
             _orderRepository = orderRepository;
             _converter = converter;
+            Mapper.Reset();
             Mapper.Initialize(cfg => { cfg.AddProfile(new HttpListenerMappingProfile()); });
         }
 
@@ -93,15 +94,15 @@ namespace HttpListener.BusinessLayer
                         case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
                         {
                             _converter.ToExcelFormat(data, memoryStream);
-                            response.ContentType = "application / vnd.ms - excel";
+                            response.AppendHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                             response.AppendHeader("Content-Disposition",
-                                "attachment; filename=translationText.xlsx");
+                                "attachment; filename=translationText.xlsx;");
                             break;
                         }
                         case "text/xml":
                         {
                             _converter.ToXmlFormat(data, memoryStream);
-                            response.ContentType = "text/xml";
+                            response.AppendHeader("Content-Type", "text/xml");
                             response.AppendHeader("Content-Disposition",
                                 "attachment; filename=translationText.xml");
                             break;
@@ -109,7 +110,7 @@ namespace HttpListener.BusinessLayer
                         case "application/xml":
                         {
                             _converter.ToXmlFormat(data, memoryStream);
-                            response.ContentType = "application/xml";
+                            response.AppendHeader("Content-Type", "application/xml");
                             response.AppendHeader("Content-Disposition",
                                 "attachment; filename=translationText.xml");
                             break;
@@ -117,7 +118,7 @@ namespace HttpListener.BusinessLayer
                         default:
                         {
                             _converter.ToExcelFormat(data, memoryStream);
-                            response.ContentType = "application / vnd.ms - excel";
+                            response.AppendHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                             response.AppendHeader("Content-Disposition",
                                 "attachment; filename=translationText.xlsx");
                             break;
@@ -158,64 +159,38 @@ namespace HttpListener.BusinessLayer
         {
             var expressionBuilder = new ExpressionBuilder<Order>();
 
-            if (searchInfo.CustomerId != null)
-            {
-                expressionBuilder.Statements.Add(
-                    new FilterStatement
-                    {
-                        PropertyName = "OrderId",
-                        Operation = Operation.EqualTo,
-                        Value = searchInfo.CustomerId
-                    });
-            }
-            else
-            {
-                if (searchInfo.From != null && searchInfo.To != null)
+                if (searchInfo.CustomerId != null)
                 {
-                    expressionBuilder.Statements.AddRange(
-                        new List<IFilterStatement>
+                    expressionBuilder.Statements.Add(
+                        new FilterStatement
                         {
-                            new FilterStatement
-                            {
-                                PropertyName = "OrderDate",
-                                Operation = Operation.GreaterThanOrEqualTo,
-                                Value = searchInfo.From
-                            },
-                            new FilterStatement
-                            {
-                                PropertyName = "OrderDate",
-                                Operation = Operation.LessThanOrEqualTo,
-                                Value = searchInfo.To
-                            }
+                            PropertyName = "CustomerId",
+                            Operation = Operation.EqualTo,
+                            Value = searchInfo.CustomerId
                         });
                 }
-                else
+
+                if (searchInfo.From != null)
                 {
-                    if (searchInfo.From != null & searchInfo.To == null)
-                    {
-                        expressionBuilder.Statements.Add(
-                            new FilterStatement
-                            {
-                                PropertyName = "OrderDate",
-                                Operation = Operation.EqualTo,
-                                Value = searchInfo.From
-                            });
-                    }
-                    else
-                    {
-                        if (searchInfo.From == null & searchInfo.To != null)
+                    expressionBuilder.Statements.Add(
+                        new FilterStatement
                         {
-                            expressionBuilder.Statements.Add(
-                                new FilterStatement
-                                {
-                                    PropertyName = "OrderDate",
-                                    Operation = Operation.EqualTo,
-                                    Value = searchInfo.To
-                                });
-                        }
-                    }
+                            PropertyName = "OrderDate",
+                            Operation = Operation.GreaterThanOrEqualTo,
+                            Value = searchInfo.From
+                        });
                 }
-            }
+
+                if (searchInfo.To != null)
+                {
+                    expressionBuilder.Statements.Add(
+                        new FilterStatement
+                        {
+                            PropertyName = "OrderDate",
+                            Operation = Operation.LessThanOrEqualTo,
+                            Value = searchInfo.To
+                        });
+                }
 
             return expressionBuilder.BuildExpression();
         }

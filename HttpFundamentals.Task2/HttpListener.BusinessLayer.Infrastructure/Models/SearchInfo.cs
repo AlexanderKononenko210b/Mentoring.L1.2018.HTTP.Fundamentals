@@ -10,7 +10,7 @@ namespace HttpListener.BusinessLayer.Infrastructure.Models
         /// <summary>
         /// Gets or sets a customer id.
         /// </summary>
-        public int? CustomerId { get; set; }
+        public string CustomerId { get; set; }
 
         /// <summary>
         /// Gets or sets a 'from' date search boarder.
