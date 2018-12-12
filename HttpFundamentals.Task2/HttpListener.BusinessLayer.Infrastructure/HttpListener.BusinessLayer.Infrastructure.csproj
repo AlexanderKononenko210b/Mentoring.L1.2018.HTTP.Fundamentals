@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\FilterStatementConnector.cs" />
     <Compile Include="Enums\Operation.cs" />
     <Compile Include="Interfaces\IConverter.cs" />
     <Compile Include="Interfaces\IFilter.cs" />

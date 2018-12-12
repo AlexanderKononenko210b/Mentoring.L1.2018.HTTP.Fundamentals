@@ -94,15 +94,15 @@ namespace HttpListener.BusinessLayer
                         case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
                         {
                             _converter.ToExcelFormat(data, memoryStream);
-                            response.ContentType = "application / vnd.ms - excel";
+                            response.AppendHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                             response.AppendHeader("Content-Disposition",
-                                "attachment; filename=translationText.xlsx");
+                                "attachment; filename=translationText.xlsx;");
                             break;
                         }
                         case "text/xml":
                         {
                             _converter.ToXmlFormat(data, memoryStream);
-                            response.ContentType = "text/xml";
+                            response.AppendHeader("Content-Type", "text/xml");
                             response.AppendHeader("Content-Disposition",
                                 "attachment; filename=translationText.xml");
                             break;
@@ -110,7 +110,7 @@ namespace HttpListener.BusinessLayer
                         case "application/xml":
                         {
                             _converter.ToXmlFormat(data, memoryStream);
-                            response.ContentType = "application/xml";
+                            response.AppendHeader("Content-Type", "application/xml");
                             response.AppendHeader("Content-Disposition",
                                 "attachment; filename=translationText.xml");
                             break;
@@ -118,7 +118,7 @@ namespace HttpListener.BusinessLayer
                         default:
                         {
                             _converter.ToExcelFormat(data, memoryStream);
-                            response.ContentType = "application / vnd.ms - excel";
+                            response.AppendHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                             response.AppendHeader("Content-Disposition",
                                 "attachment; filename=translationText.xlsx");
                             break;

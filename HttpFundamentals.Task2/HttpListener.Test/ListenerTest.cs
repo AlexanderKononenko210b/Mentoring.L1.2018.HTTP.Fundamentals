@@ -1,10 +1,11 @@
 ﻿using System;
-using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HttpListener.BusinessLayer;
 using HttpListener.BusinessLayer.Converters;
+using HttpListener.BusinessLayer.Infrastructure.Interfaces;
 using HttpListener.BusinessLayer.Parsers;
 using HttpListener.DataLayer;
 using NUnit.Framework;
@@ -14,48 +15,89 @@ namespace HttpListener.Test
     [TestFixture]
     public class ListenerTest
     {
-        private ListenerService _listenerService;
+        private readonly string ExcelAcceptType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        private readonly string TextXmlAcceptType = "text/xml";
+        private readonly string ApplicationXmlAcceptType = "application/xml";
+        private readonly string DefaultAcceptType = "custom/type";
 
-        [SetUp]
-        public void Initialize()
+        private readonly NorthwindContext _context;
+        private readonly ListenerService _service;
+        private readonly HttpClient _client;
+        private readonly UriBuilder _uriBuilder;
+        private readonly IConverter _converter;
+
+        public ListenerTest()
         {
-            using (var context = new NorthwindContext())
-            {
-                var parser = new Parser();
-                var orderRepository = new OrderRepository(context);
-                var converter = new Converter();
-                _listenerService = new ListenerService(parser, orderRepository, converter);
-            }
+            _context = new NorthwindContext();
+            var parser = new Parser();
+            var orderRepository = new OrderRepository(_context);
+            var converter = new Converter();
+            _service = new ListenerService(parser, orderRepository, converter);
+            Thread listenerThread = new Thread(_service.Listen);
+            listenerThread.Start();
+            _client = new HttpClient();
+            _uriBuilder = new UriBuilder("http://localhost:81");
+            _converter = new Converter();
         }
 
         [Test]
-        public void Listener_Test()
+        public async Task Listener_Get_Excel_Data_Accept_ExcelAcceptType()
         {
-            using (var context = new NorthwindContext())
-            {
-                var parser = new Parser();
-                var orderRepository = new OrderRepository(context);
-                var converter = new Converter();
-                _listenerService = new ListenerService(parser, orderRepository, converter);
+                _uriBuilder.Query = "customerId=VINET";
+                _client.DefaultRequestHeaders.Add("Accept", ExcelAcceptType);
+                var response = await _client.GetAsync(_uriBuilder.Uri);
+                var contentType = response.Content.Headers.ContentType.MediaType;
 
-                _listenerService.Listen();
+                Assert.AreEqual(true, response.IsSuccessStatusCode);
+                Assert.AreEqual(ExcelAcceptType, contentType);
+        }
+
+        [Test]
+        public async Task Listener_Get_Xml_Data_Accept_TextXmlAcceptType()
+        {
+            _uriBuilder.Query = "customerId=VINET";
+            _client.DefaultRequestHeaders.Add("Accept", TextXmlAcceptType);
+            var response = await _client.GetAsync(_uriBuilder.Uri);
+            var contentType = response.Content.Headers.ContentType.MediaType;
+
+            using (var stream = await response.Content.ReadAsStreamAsync())
+            {
+                var data = _converter.FromXmlFormat(stream);
+                Assert.True(data.Any());
             }
 
-            //Thread listenerThread = new Thread(_listenerService.Listen);
-            //listenerThread.Start();
+            Assert.AreEqual(true, response.IsSuccessStatusCode);
+            Assert.AreEqual(TextXmlAcceptType, contentType);
+        }
 
-            //using (var client = new HttpClient())
-            //{
-            //    UriBuilder builder = new UriBuilder("http://localhost:81");
-            //    builder.Query = "customerId=10248";
+        [Test]
+        public async Task Listener_Get_Xml_Data_Accept_ApplicationXmlAcceptType()
+        {
+            _uriBuilder.Query = "customerId=VINET";
+            _client.DefaultRequestHeaders.Add("Accept", ApplicationXmlAcceptType);
+            var response = await _client.GetAsync(_uriBuilder.Uri);
+            var contentType = response.Content.Headers.ContentType.MediaType;
 
-            //    var result = client.GetAsync(builder.Uri).Result;
+            using (var stream = await response.Content.ReadAsStreamAsync())
+            {
+                var data = _converter.FromXmlFormat(stream);
+                Assert.True(data.Any());
+            }
 
-            //    using (StreamReader sr = new StreamReader(result.Content.ReadAsStreamAsync().Result))
-            //    {
-            //        Console.WriteLine(sr.ReadToEnd());
-            //    }
-            //}
+            Assert.AreEqual(true, response.IsSuccessStatusCode);
+            Assert.AreEqual(ApplicationXmlAcceptType, contentType);
+        }
+
+        [Test]
+        public async Task Listener_Get_Xml_Data_Accept_DefaultAcceptType()
+        {
+            _uriBuilder.Query = "customerId=VINET";
+            _client.DefaultRequestHeaders.Add("Accept", DefaultAcceptType);
+            var response = await _client.GetAsync(_uriBuilder.Uri);
+            var contentType = response.Content.Headers.ContentType.MediaType;
+
+            Assert.AreEqual(true, response.IsSuccessStatusCode);
+            Assert.AreEqual(ExcelAcceptType, contentType);
         }
     }
 }
