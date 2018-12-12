@@ -41,9 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\FilterStatementConnector.cs" />
+    <Compile Include="Enums\Operation.cs" />
     <Compile Include="Interfaces\IConverter.cs" />
-    <Compile Include="Interfaces\IMapper.cs" />
+    <Compile Include="Interfaces\IFilter.cs" />
+    <Compile Include="Interfaces\IFilterStatement.cs" />
     <Compile Include="Interfaces\IParser.cs" />
+    <Compile Include="Models\FilterStatement.cs" />
     <Compile Include="Models\OrderView.cs" />
     <Compile Include="Models\SearchInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

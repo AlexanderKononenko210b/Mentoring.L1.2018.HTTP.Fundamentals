@@ -36,11 +36,11 @@ namespace HttpListener.BusinessLayer.Parsers
             if (queryStrings == null || queryStrings.Count == 0) return null;
 
             var searchInfo = new SearchInfo();
-            searchInfo.CustomerId = queryStrings["customerId"] != null && int.TryParse(queryStrings["CustomerId"], out var customerId) ? customerId : default(int);
-            searchInfo.From = queryStrings["from"] != null && DateTime.TryParse(queryStrings["from"], out var fromDateTime) ? fromDateTime : default(DateTime);
-            searchInfo.To = queryStrings["to"] != null && DateTime.TryParse(queryStrings["to"], out var toDateTime) ? toDateTime : default(DateTime);
-            searchInfo.Skip = queryStrings["skip"] != null && int.TryParse(queryStrings["skip"], out var skipResult) ? skipResult : default(int);
-            searchInfo.Take = queryStrings["take"] != null && int.TryParse(queryStrings["take"], out var takeResult) ? takeResult : default(int);
+            searchInfo.CustomerId = queryStrings["customerId"] != null && int.TryParse(queryStrings["CustomerId"], out var customerId) ? (int?)customerId : null;
+            searchInfo.From = queryStrings["from"] != null && DateTime.TryParse(queryStrings["from"], out var fromDateTime) ? (DateTime?)fromDateTime : null;
+            searchInfo.To = queryStrings["to"] != null && DateTime.TryParse(queryStrings["to"], out var toDateTime) ? (DateTime?)toDateTime : null;
+            searchInfo.Skip = queryStrings["skip"] != null && int.TryParse(queryStrings["skip"], out var skipResult) ? (int?)skipResult : null;
+            searchInfo.Take = queryStrings["take"] != null && int.TryParse(queryStrings["take"], out var takeResult) ? (int?)takeResult : null;
 
             return searchInfo;
         }
@@ -51,12 +51,12 @@ namespace HttpListener.BusinessLayer.Parsers
         /// <param name="name">The name parameter.</param>
         /// <param name="data">The body data as string[].</param>
         /// <returns></returns>
-        private int GetIntParameter(string name, string[] data)
+        private int? GetIntParameter(string name, string[] data)
         {
             var parameterKeyValue = data.FirstOrDefault(param => param.StartsWith(name))?.Split('=');
             return parameterKeyValue != null &&
                    parameterKeyValue.Length == 2 &&
-                                    int.TryParse(parameterKeyValue[1], out var parameterValue) ? parameterValue : 0;
+                                    int.TryParse(parameterKeyValue[1], out var parameterValue) ? (int?)parameterValue : null;
         }
 
         /// <summary>
@@ -65,12 +65,12 @@ namespace HttpListener.BusinessLayer.Parsers
         /// <param name="name">The name parameter.</param>
         /// <param name="data">The body data as string[].</param>
         /// <returns></returns>
-        private DateTime GetDateTimeParameter(string name, string[] data)
+        private DateTime? GetDateTimeParameter(string name, string[] data)
         {
             var parameterKeyValue = data.FirstOrDefault(param => param.StartsWith(name))?.Split('=');
             return parameterKeyValue != null &&
                    parameterKeyValue.Length == 2 &&
-                   DateTime.TryParse(parameterKeyValue[1], out var parameterValue) ? parameterValue : default(DateTime);
+                   DateTime.TryParse(parameterKeyValue[1], out var parameterValue) ? (DateTime?)parameterValue : null;
         }
     }
 }

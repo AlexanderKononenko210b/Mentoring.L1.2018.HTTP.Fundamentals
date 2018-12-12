@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using HttpListener.DataLayer.Infrastructure.Interfaces;
 using HttpListener.DataLayer.Infrastructure.Models;
 
@@ -23,7 +24,7 @@ namespace HttpListener.DataLayer
         }
 
         ///<inheritdoc/>
-        public IEnumerable<Order> GetOrders(Func<Order, bool> predicate)
+        public IEnumerable<Order> GetOrders(Expression<Func<Order, bool>> predicate)
         {
             return _context.Set<Order>().Where(predicate);
         }

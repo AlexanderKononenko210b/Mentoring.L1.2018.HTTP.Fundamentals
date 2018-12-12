@@ -1,13 +1,17 @@
-﻿using System;
+﻿using HttpListener.BusinessLayer.Infrastructure.Interfaces;
+using HttpListener.BusinessLayer.Infrastructure.Models;
+using HttpListener.BusinessLayer.MapperConfigurations;
+using HttpListener.DataLayer.Infrastructure.Interfaces;
+using HttpListener.DataLayer.Infrastructure.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
-using HttpListener.BusinessLayer.Infrastructure.Interfaces;
-using HttpListener.BusinessLayer.Infrastructure.Models;
-using HttpListener.DataLayer.Infrastructure.Interfaces;
-using HttpListener.DataLayer.Infrastructure.Models;
+using HttpListener.BusinessLayer.Infrastructure.Enums;
+using Mapper = AutoMapper.Mapper;
 
 namespace HttpListener.BusinessLayer
 {
@@ -19,18 +23,16 @@ namespace HttpListener.BusinessLayer
         private readonly IParser _parser;
         private readonly IRepository<Order> _orderRepository;
         private readonly IConverter _converter;
-        private readonly IMapper<Order, OrderView> _mapper;
 
         public ListenerService(
             IParser parser,
             IRepository<Order> orderRepository,
-            IConverter converter,
-            IMapper<Order, OrderView> mapper)
+            IConverter converter)
         {
             _parser = parser;
             _orderRepository = orderRepository;
             _converter = converter;
-            _mapper = mapper;
+            Mapper.Initialize(cfg => { cfg.AddProfile(new HttpListenerMappingProfile()); });
         }
 
         public void Listen()
@@ -63,7 +65,7 @@ namespace HttpListener.BusinessLayer
                     searchInfo = _parser.ParseQuery(dataFromQuery);
                 }
 
-                var predicate = GetPredicate(searchInfo);
+                var predicate = GetWorkExpression(searchInfo);
                 var data = GetData(searchInfo, predicate);
                 var accept = GetAcceptType(request.AcceptTypes);
 
@@ -148,81 +150,113 @@ namespace HttpListener.BusinessLayer
         }
 
         /// <summary>
+        /// Get expression.
+        /// </summary>
+        /// <param name="searchInfo">The search info.</param>
+        /// <returns></returns>
+        private Expression<Func<Order, bool>> GetWorkExpression(SearchInfo searchInfo)
+        {
+            var expressionBuilder = new ExpressionBuilder<Order>();
+
+            if (searchInfo.CustomerId != null)
+            {
+                expressionBuilder.Statements.Add(
+                    new FilterStatement
+                    {
+                        PropertyName = "OrderId",
+                        Operation = Operation.EqualTo,
+                        Value = searchInfo.CustomerId
+                    });
+            }
+            else
+            {
+                if (searchInfo.From != null && searchInfo.To != null)
+                {
+                    expressionBuilder.Statements.AddRange(
+                        new List<IFilterStatement>
+                        {
+                            new FilterStatement
+                            {
+                                PropertyName = "OrderDate",
+                                Operation = Operation.GreaterThanOrEqualTo,
+                                Value = searchInfo.From
+                            },
+                            new FilterStatement
+                            {
+                                PropertyName = "OrderDate",
+                                Operation = Operation.LessThanOrEqualTo,
+                                Value = searchInfo.To
+                            }
+                        });
+                }
+                else
+                {
+                    if (searchInfo.From != null & searchInfo.To == null)
+                    {
+                        expressionBuilder.Statements.Add(
+                            new FilterStatement
+                            {
+                                PropertyName = "OrderDate",
+                                Operation = Operation.EqualTo,
+                                Value = searchInfo.From
+                            });
+                    }
+                    else
+                    {
+                        if (searchInfo.From == null & searchInfo.To != null)
+                        {
+                            expressionBuilder.Statements.Add(
+                                new FilterStatement
+                                {
+                                    PropertyName = "OrderDate",
+                                    Operation = Operation.EqualTo,
+                                    Value = searchInfo.To
+                                });
+                        }
+                    }
+                }
+            }
+
+            return expressionBuilder.BuildExpression();
+        }
+
+        /// <summary>
         /// Get data.
         /// </summary>
         /// <param name="searchInfo">The search info.</param>
         /// <param name="predicate">The predicate.</param>
         /// <returns></returns>
-        private List<OrderView> GetData(SearchInfo searchInfo, Func<Order, bool> predicate)
+        private List<OrderView> GetData(SearchInfo searchInfo, Expression<Func<Order, bool>> predicate)
         {
-            var data = new List<Order>();
-
-            if (searchInfo == null)
+            if (searchInfo.Take != null && searchInfo.Skip != null)
             {
-                data = _orderRepository.GetOrders(order => predicate(order)).ToList();
-            }
-            else
-            {
-                if (searchInfo.CustomerId != 0)
-                {
-                    data = _orderRepository.GetOrders(order => predicate(order)).ToList();
-                }
-                else
-                {
-                    if (searchInfo.Skip != 0 && searchInfo.Take != 0)
-                    {
-                        data = _orderRepository.GetOrders(order => predicate(order)).Skip(searchInfo.Skip).Take(searchInfo.Take)
-                            .ToList();
-                    }
-                    else
-                    {
-                        if (searchInfo.Skip == 0 && searchInfo.Take != 0)
-                        {
-                            data = _orderRepository.GetOrders(order => predicate(order)).Take(searchInfo.Take).ToList();
-                        }
-                        else
-                        {
-                            data = _orderRepository.GetOrders(order => predicate(order)).Skip(searchInfo.Skip).ToList();
-                        }
-                    }
-                }
-            }
-            return data.Select(order => _mapper.Map(order)).ToList();
-        }
-
-        /// <summary>
-        /// Get predicate.
-        /// </summary>
-        /// <param name="searchInfo">The search info.</param>
-        /// <returns>The <see cref="Func{Order, bool}"/></returns>
-        private Func<Order, bool> GetPredicate(SearchInfo searchInfo)
-        {
-            if (searchInfo == null)
-            {
-                return order => order.OrderID == order.OrderID;
+                return _orderRepository.GetOrders(predicate)
+                    .Skip(searchInfo.Skip.Value)
+                    .Take(searchInfo.Take.Value)
+                    .Select(order => Mapper.Map<OrderView>(order))
+                    .ToList();
             }
 
-            if (searchInfo.CustomerId != 0)
+            if (searchInfo.Take == null && searchInfo.Skip.HasValue)
             {
-                return order => order.OrderID == searchInfo.CustomerId;
+                return _orderRepository.GetOrders(predicate)
+                    .Skip(searchInfo.Skip.Value)
+                    .Select(order => Mapper.Map<OrderView>(order))
+                    .ToList();
             }
 
-            if (searchInfo.From != default(DateTime) && searchInfo.To != default(DateTime))
+            if (searchInfo.Skip == null && searchInfo.Take.HasValue)
             {
-                return order => order.OrderDate >= searchInfo.From && order.OrderDate <= searchInfo.To;
+                return _orderRepository.GetOrders(predicate)
+                    .Take(searchInfo.Take.Value)
+                    .Select(order => Mapper.Map<OrderView>(order))
+                    .ToList();
             }
 
-            if (searchInfo.From == default(DateTime) && searchInfo.To != default(DateTime))
-            {
-                return order => order.OrderDate == searchInfo.To;
-            }
+            return _orderRepository.GetOrders(predicate)
+                .Select(order => Mapper.Map<OrderView>(order))
+                .ToList();
 
-            if (searchInfo.From != default(DateTime) && searchInfo.To == default(DateTime))
-            {
-                return order => order.OrderDate == searchInfo.From;
-            }
-
-            return order => order.OrderID == order.OrderID;
         }
     }
 }
