@@ -234,6 +234,7 @@ namespace HttpListener.BusinessLayer
                     .Skip(searchInfo.Skip.Value)
                     .Take(searchInfo.Take.Value)
                     .Select(order => Mapper.Map<OrderView>(order))
+                    .OrderBy(order => order.OrderID)
                     .ToList();
             }
 
@@ -242,6 +243,7 @@ namespace HttpListener.BusinessLayer
                 return _orderRepository.GetOrders(predicate)
                     .Skip(searchInfo.Skip.Value)
                     .Select(order => Mapper.Map<OrderView>(order))
+                    .OrderBy(order => order.OrderID)
                     .ToList();
             }
 
@@ -250,6 +252,7 @@ namespace HttpListener.BusinessLayer
                 return _orderRepository.GetOrders(predicate)
                     .Take(searchInfo.Take.Value)
                     .Select(order => Mapper.Map<OrderView>(order))
+                    .OrderBy(order => order.OrderID)
                     .ToList();
             }
 

@@ -36,11 +36,11 @@ namespace HttpListener.BusinessLayer.Parsers
             if (queryStrings == null || queryStrings.Count == 0) return null;
 
             var searchInfo = new SearchInfo();
-            searchInfo.CustomerId = queryStrings["customerId"] != null && int.TryParse(queryStrings["CustomerId"], out var customerId) ? (int?)customerId : null;
-            searchInfo.From = queryStrings["from"] != null && DateTime.TryParse(queryStrings["from"], out var fromDateTime) ? (DateTime?)fromDateTime : null;
-            searchInfo.To = queryStrings["to"] != null && DateTime.TryParse(queryStrings["to"], out var toDateTime) ? (DateTime?)toDateTime : null;
-            searchInfo.Skip = queryStrings["skip"] != null && int.TryParse(queryStrings["skip"], out var skipResult) ? (int?)skipResult : null;
-            searchInfo.Take = queryStrings["take"] != null && int.TryParse(queryStrings["take"], out var takeResult) ? (int?)takeResult : null;
+            searchInfo.CustomerId = int.TryParse(queryStrings["CustomerId"], out var customerId) ? (int?)customerId : null;
+            searchInfo.From = DateTime.TryParse(queryStrings["from"], out var fromDateTime) ? (DateTime?)fromDateTime : null;
+            searchInfo.To = DateTime.TryParse(queryStrings["to"], out var toDateTime) ? (DateTime?)toDateTime : null;
+            searchInfo.Skip = int.TryParse(queryStrings["skip"], out var skipResult) ? (int?)skipResult : null;
+            searchInfo.Take = int.TryParse(queryStrings["take"], out var takeResult) ? (int?)takeResult : null;
 
             return searchInfo;
         }
