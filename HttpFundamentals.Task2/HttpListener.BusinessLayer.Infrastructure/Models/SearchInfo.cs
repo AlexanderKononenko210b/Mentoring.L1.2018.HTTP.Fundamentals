@@ -10,26 +10,26 @@ namespace HttpListener.BusinessLayer.Infrastructure.Models
         /// <summary>
         /// Gets or sets a customer id.
         /// </summary>
-        public int CustomerId { get; set; }
+        public int? CustomerId { get; set; }
 
         /// <summary>
         /// Gets or sets a 'from' date search boarder.
         /// </summary>
-        public DateTime From { get; set; }
+        public DateTime? From { get; set; }
 
         /// <summary>
         /// Gets or sets a 'to' date search boarder.
         /// </summary>
-        public DateTime To { get; set; }
+        public DateTime? To { get; set; }
 
         /// <summary>
         /// Gets or sets count orders skipping in search result.
         /// </summary>
-        public int Skip { get; set; }
+        public int? Skip { get; set; }
 
         /// <summary>
         /// Gets or sets count orders to take in search result.
         /// </summary>
-        public int Take { get; set; }  
+        public int? Take { get; set; }  
     }
 }
