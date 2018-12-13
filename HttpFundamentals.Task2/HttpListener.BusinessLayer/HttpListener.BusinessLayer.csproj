@@ -77,7 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\Converter.cs" />
-    <Compile Include="ExpressionBuilder.cs" />
+    <Compile Include="ExpressionBuilders\ExpressionBuilder.cs" />
     <Compile Include="ListenerService.cs" />
     <Compile Include="MapperConfigurations\HttpListenerMappingProfile.cs" />
     <Compile Include="Parsers\Parser.cs" />
