@@ -37,15 +37,16 @@ namespace HttpListener.Test
             listenerThread.Start();
             _client = new HttpClient();
             _uriBuilder = new UriBuilder("http://localhost:81");
+            _uriBuilder.Query = "customerId=VINET";
             _converter = new Converter();
         }
 
         [Test]
-        public async Task Listener_Get_Excel_Data_Accept_ExcelAcceptType()
+        public void Listener_Get_Excel_Data_Accept_ExcelAcceptType()
         {
-                _uriBuilder.Query = "customerId=VINET";
+                _client.DefaultRequestHeaders.Remove("Accept");
                 _client.DefaultRequestHeaders.Add("Accept", ExcelAcceptType);
-                var response = await _client.GetAsync(_uriBuilder.Uri);
+                var response = _client.GetAsync(_uriBuilder.Uri).Result;
                 var contentType = response.Content.Headers.ContentType.MediaType;
 
                 Assert.AreEqual(true, response.IsSuccessStatusCode);
@@ -53,14 +54,14 @@ namespace HttpListener.Test
         }
 
         [Test]
-        public async Task Listener_Get_Xml_Data_Accept_TextXmlAcceptType()
+        public void Listener_Get_Xml_Data_Accept_TextXmlAcceptType()
         {
-            _uriBuilder.Query = "customerId=VINET";
+            _client.DefaultRequestHeaders.Remove("Accept");
             _client.DefaultRequestHeaders.Add("Accept", TextXmlAcceptType);
-            var response = await _client.GetAsync(_uriBuilder.Uri);
+            var response = _client.GetAsync(_uriBuilder.Uri).Result;
             var contentType = response.Content.Headers.ContentType.MediaType;
 
-            using (var stream = await response.Content.ReadAsStreamAsync())
+            using (var stream = response.Content.ReadAsStreamAsync().Result)
             {
                 var data = _converter.FromXmlFormat(stream);
                 Assert.True(data.Any());
@@ -71,14 +72,14 @@ namespace HttpListener.Test
         }
 
         [Test]
-        public async Task Listener_Get_Xml_Data_Accept_ApplicationXmlAcceptType()
+        public void Listener_Get_Xml_Data_Accept_ApplicationXmlAcceptType()
         {
-            _uriBuilder.Query = "customerId=VINET";
+            _client.DefaultRequestHeaders.Remove("Accept");
             _client.DefaultRequestHeaders.Add("Accept", ApplicationXmlAcceptType);
-            var response = await _client.GetAsync(_uriBuilder.Uri);
+            var response = _client.GetAsync(_uriBuilder.Uri).Result;
             var contentType = response.Content.Headers.ContentType.MediaType;
 
-            using (var stream = await response.Content.ReadAsStreamAsync())
+            using (var stream =  response.Content.ReadAsStreamAsync().Result)
             {
                 var data = _converter.FromXmlFormat(stream);
                 Assert.True(data.Any());
@@ -89,11 +90,11 @@ namespace HttpListener.Test
         }
 
         [Test]
-        public async Task Listener_Get_Xml_Data_Accept_DefaultAcceptType()
+        public void Listener_Get_Xml_Data_Accept_DefaultAcceptType()
         {
-            _uriBuilder.Query = "customerId=VINET";
+            _client.DefaultRequestHeaders.Remove("Accept");
             _client.DefaultRequestHeaders.Add("Accept", DefaultAcceptType);
-            var response = await _client.GetAsync(_uriBuilder.Uri);
+            var response = _client.GetAsync(_uriBuilder.Uri).Result;
             var contentType = response.Content.Headers.ContentType.MediaType;
 
             Assert.AreEqual(true, response.IsSuccessStatusCode);
