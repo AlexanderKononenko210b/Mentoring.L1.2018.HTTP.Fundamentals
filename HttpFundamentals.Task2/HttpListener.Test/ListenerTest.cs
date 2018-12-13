@@ -5,9 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using HttpListener.BusinessLayer;
 using HttpListener.BusinessLayer.Converters;
+using HttpListener.BusinessLayer.ExpressionBuilders;
 using HttpListener.BusinessLayer.Infrastructure.Interfaces;
 using HttpListener.BusinessLayer.Parsers;
 using HttpListener.DataLayer;
+using HttpListener.DataLayer.Infrastructure.Models;
 using NUnit.Framework;
 
 namespace HttpListener.Test
@@ -32,7 +34,8 @@ namespace HttpListener.Test
             var parser = new Parser();
             var orderRepository = new OrderRepository(_context);
             var converter = new Converter();
-            _service = new ListenerService(parser, orderRepository, converter);
+            var filter = new ExpressionBuilder<Order>();
+            _service = new ListenerService(parser, orderRepository, converter, filter);
             Thread listenerThread = new Thread(_service.Listen);
             listenerThread.Start();
             _client = new HttpClient();

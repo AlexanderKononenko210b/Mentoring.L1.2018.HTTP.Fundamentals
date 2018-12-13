@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
+using HttpListener.BusinessLayer.Infrastructure.Models;
 
 namespace HttpListener.BusinessLayer.Infrastructure.Interfaces
 {
@@ -11,13 +11,8 @@ namespace HttpListener.BusinessLayer.Infrastructure.Interfaces
         where T : class
     {
         /// <summary>
-        /// Group of statements that compose this filter.
-        /// </summary>
-        List<IFilterStatement> Statements { get; set; }
-
-        /// <summary>
         /// Build a Linq expression.
         /// </summary>
-        Expression<Func<T, bool>> BuildExpression();
+        Expression<Func<T, bool>> BuildExpression(SearchInfo searchInfo);
     }
 }

@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using HttpListener.BusinessLayer.Infrastructure.Attributes;
 using HttpListener.BusinessLayer.Infrastructure.Enums;
 using HttpListener.BusinessLayer.Infrastructure.Interfaces;
+using HttpListener.BusinessLayer.Infrastructure.Models;
 
-namespace HttpListener.BusinessLayer
+namespace HttpListener.BusinessLayer.ExpressionBuilders
 {
     /// <summary>
     /// Represents a <see cref="ExpressionBuilder{T}"/> class
@@ -13,6 +17,7 @@ namespace HttpListener.BusinessLayer
     {
         private readonly Dictionary<Operation, Func<Expression, Expression, Expression>> _expessions =
             new Dictionary<Operation, Func<Expression, Expression, Expression>>();
+        private readonly List<IFilterStatement> _statements = new List<IFilterStatement>();
 
         /// <summary>
         /// Initialize a <see cref="ExpressionBuilder{T}"/> instance.
@@ -23,16 +28,19 @@ namespace HttpListener.BusinessLayer
         }
 
         ///<inheritdoc/>
-        public List<IFilterStatement> Statements { get; set; } = 
-            new List<IFilterStatement>();
-
-        ///<inheritdoc/>
-        public Expression<Func<T, bool>> BuildExpression()
+        public Expression<Func<T, bool>> BuildExpression(SearchInfo searchInfo)
         {
+            GetDataForBuildExpression(searchInfo);
+
+            if (!_statements.Any())
+            {
+                return null;
+            }
+
             Expression finalExpression = null;
             var parameter = Expression.Parameter(typeof(T), "item");
 
-            foreach (var statement in Statements)
+            foreach (var statement in _statements)
             {
                 var member = GetMemberExpression(parameter, statement.PropertyName);
                 Expression constant;
@@ -51,6 +59,38 @@ namespace HttpListener.BusinessLayer
             }
 
             return finalExpression != null ? Expression.Lambda<Func<T, bool>>(finalExpression, parameter) : null;
+        }
+
+        /// <summary>
+        /// Get data for build expression.
+        /// </summary>
+        /// <param name="searchInfo">The search info.</param>
+        /// <returns></returns>
+        private void GetDataForBuildExpression(SearchInfo searchInfo)
+        {
+            var properties = searchInfo.GetType().GetProperties();
+
+            foreach (var property in properties)
+            {
+                var expressionBuilderAttribute = (ExpressionBuilderAttribute)property.GetCustomAttribute(typeof(ExpressionBuilderAttribute));
+
+                if (expressionBuilderAttribute != null)
+                {
+                    var value = property.GetValue(searchInfo);
+
+                    if (value != null)
+                    {
+                        var filterStatement = new FilterStatement
+                        {
+                            PropertyName = expressionBuilderAttribute.PropertyName,
+                            Operation = expressionBuilderAttribute.Operation,
+                            Value = value
+                        };
+
+                        _statements.Add(filterStatement);
+                    }
+                }
+            }
         }
 
         /// <summary>

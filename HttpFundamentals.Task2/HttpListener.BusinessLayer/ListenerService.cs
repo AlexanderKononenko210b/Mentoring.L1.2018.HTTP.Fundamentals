@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
-using HttpListener.BusinessLayer.Infrastructure.Enums;
 using HttpListener.BusinessLayer.Infrastructure.Interfaces;
 using HttpListener.BusinessLayer.Infrastructure.Models;
 using HttpListener.BusinessLayer.MapperConfigurations;
@@ -23,15 +22,18 @@ namespace HttpListener.BusinessLayer
         private readonly IParser _parser;
         private readonly IRepository<Order> _orderRepository;
         private readonly IConverter _converter;
+        private readonly IFilter<Order> _filter;
 
         public ListenerService(
             IParser parser,
             IRepository<Order> orderRepository,
-            IConverter converter)
+            IConverter converter,
+            IFilter<Order> filter)
         {
             _parser = parser;
             _orderRepository = orderRepository;
             _converter = converter;
+            _filter = filter;
             Mapper.Reset();
             Mapper.Initialize(cfg => { cfg.AddProfile(new HttpListenerMappingProfile()); });
         }
@@ -66,7 +68,7 @@ namespace HttpListener.BusinessLayer
                     searchInfo = _parser.ParseQuery(dataFromQuery);
                 }
 
-                var predicate = GetWorkExpression(searchInfo);
+                var predicate = _filter.BuildExpression(searchInfo);
                 var data = GetData(searchInfo, predicate);
                 var accept = GetAcceptType(request.AcceptTypes);
 
@@ -151,51 +153,6 @@ namespace HttpListener.BusinessLayer
         }
 
         /// <summary>
-        /// Get expression.
-        /// </summary>
-        /// <param name="searchInfo">The search info.</param>
-        /// <returns></returns>
-        private Expression<Func<Order, bool>> GetWorkExpression(SearchInfo searchInfo)
-        {
-            var expressionBuilder = new ExpressionBuilder<Order>();
-
-                if (searchInfo.CustomerId != null)
-                {
-                    expressionBuilder.Statements.Add(
-                        new FilterStatement
-                        {
-                            PropertyName = "CustomerId",
-                            Operation = Operation.EqualTo,
-                            Value = searchInfo.CustomerId
-                        });
-                }
-
-                if (searchInfo.From != null)
-                {
-                    expressionBuilder.Statements.Add(
-                        new FilterStatement
-                        {
-                            PropertyName = "OrderDate",
-                            Operation = Operation.GreaterThanOrEqualTo,
-                            Value = searchInfo.From
-                        });
-                }
-
-                if (searchInfo.To != null)
-                {
-                    expressionBuilder.Statements.Add(
-                        new FilterStatement
-                        {
-                            PropertyName = "OrderDate",
-                            Operation = Operation.LessThanOrEqualTo,
-                            Value = searchInfo.To
-                        });
-                }
-
-            return expressionBuilder.BuildExpression();
-        }
-
-        /// <summary>
         /// Get data.
         /// </summary>
         /// <param name="searchInfo">The search info.</param>
@@ -234,7 +191,6 @@ namespace HttpListener.BusinessLayer
             return _orderRepository.GetOrders(predicate)
                 .Select(order => Mapper.Map<OrderView>(order))
                 .ToList();
-
         }
     }
 }
